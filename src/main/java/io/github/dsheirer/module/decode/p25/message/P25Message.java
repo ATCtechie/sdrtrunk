@@ -22,6 +22,8 @@ import io.github.dsheirer.alias.Alias;
 import io.github.dsheirer.alias.AliasList;
 import io.github.dsheirer.bits.BinaryMessage;
 import io.github.dsheirer.edac.CRC;
+import io.github.dsheirer.identifier.IIdentifier;
+import io.github.dsheirer.identifier.integer.node.APCO25Nac;
 import io.github.dsheirer.map.Plottable;
 import io.github.dsheirer.message.Message;
 import io.github.dsheirer.module.decode.p25.reference.DataUnitID;
@@ -30,9 +32,6 @@ import java.text.SimpleDateFormat;
 
 public class P25Message extends Message
 {
-    public enum DuplexMode {HALF, FULL};
-    public enum SessionMode {PACKET, CIRCUIT};
-
     public static final int[] NAC = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
     public static final int[] DUID = {12, 13, 14, 15};
     public static final int[] BCH = {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
@@ -43,8 +42,8 @@ public class P25Message extends Message
     protected BinaryMessage mMessage;
     protected DataUnitID mDUID;
     protected AliasList mAliasList;
-
     protected CRC[] mCRC;
+    private IIdentifier mNAC;
 
     public P25Message(BinaryMessage message, DataUnitID duid, AliasList aliasList)
     {
@@ -70,9 +69,14 @@ public class P25Message extends Message
         return mAliasList;
     }
 
-    public String getNAC()
+    public IIdentifier getNAC()
     {
-        return mMessage.getHex(NAC, 3);
+        if(mNAC == null)
+        {
+            mNAC = APCO25Nac.create(mMessage.getInt(NAC));
+        }
+
+        return mNAC;
     }
 
     public DataUnitID getDUID()

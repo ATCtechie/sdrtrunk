@@ -30,9 +30,9 @@ public class LDULCMessageFactory
 				case CALL_TERMINATION_OR_CANCELLATION:
 					return new CallTermination( message );
 				case CHANNEL_IDENTIFIER_UPDATE:
-					return new ChannelIdentifierUpdate( message );
+					return new ChannelIdentifierUpdateFrequency( message );
 				case CHANNEL_IDENTIFIER_UPDATE_EXPLICIT:
-					return new ChannelIdentifierUpdateExplicit( message );
+					return new ChannelIdentifierUpdateExplicitFrequency( message );
 				case EXTENDED_FUNCTION_COMMAND:
 					return new ExtendedFunctionCommand( message );
 				case GROUP_AFFILIATION_QUERY:

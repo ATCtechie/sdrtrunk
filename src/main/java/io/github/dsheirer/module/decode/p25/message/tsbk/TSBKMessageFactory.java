@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * sdr-trunk
+ * Copyright (C) 2014-2018 Dennis Sheirer
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by  the Free Software Foundation, either version 3 of the License, or  (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful,  but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License  along with this program.
+ * If not, see <http://www.gnu.org/licenses/>
+ *
+ ******************************************************************************/
 package io.github.dsheirer.module.decode.p25.message.tsbk;
 
 import io.github.dsheirer.alias.AliasList;
@@ -20,9 +35,9 @@ import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.DenyRespons
 import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.ExtendedFunctionCommand;
 import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.GroupAffiliationQuery;
 import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.GroupAffiliationResponse;
-import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.IdentifierUpdateNonVUHF;
-import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.IdentifierUpdateTDMA;
-import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.IdentifierUpdateVUHF;
+import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.IdentifierUpdateNonVUHFFrequency;
+import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.IdentifierUpdateTDMAFrequency;
+import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.IdentifierUpdateVUHFFrequency;
 import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.LocationRegistrationResponse;
 import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.MessageUpdate;
 import io.github.dsheirer.module.decode.p25.message.tsbk.osp.control.NetworkStatusBroadcast;
@@ -62,141 +77,136 @@ import io.github.dsheirer.module.decode.p25.reference.Vendor;
 
 public class TSBKMessageFactory
 {
-	public static TSBKMessage getMessage( BinaryMessage message, 
-	                                      DataUnitID duid,
-	                                      AliasList aliasList )
-	{
-		Vendor vendor = Vendor.fromValue(
-				message.getInt( TSBKMessage.VENDOR_ID ) );
-		
-		switch( vendor )
-		{
-			case STANDARD:
-				Opcode opcode =
-					Opcode.fromValue( message.getInt( TSBKMessage.OPCODE ) );
+    public static TSBKMessage getMessage(BinaryMessage message, DataUnitID duid, AliasList aliasList)
+    {
+        Vendor vendor = Vendor.fromValue(message.getInt(TSBKMessage.VENDOR_ID));
 
-				switch( opcode )
-				{
+        switch(vendor)
+        {
+            case STANDARD:
+                Opcode opcode = Opcode.fromValue(message.getInt(TSBKMessage.OPCODE));
+
+                switch(opcode)
+                {
                     case ACKNOWLEDGE_RESPONSE:
-                        return new AcknowledgeResponse( message, duid, aliasList );
+                        return new AcknowledgeResponse(message, duid, aliasList);
                     case ADJACENT_STATUS_BROADCAST:
-                        return new AdjacentStatusBroadcast( message, duid, aliasList );
+                        return new AdjacentStatusBroadcast(message, duid, aliasList);
                     case AUTHENTICATION_COMMAND:
-                        return new AuthenticationCommand( message, duid, aliasList );
+                        return new AuthenticationCommand(message, duid, aliasList);
                     case CALL_ALERT:
-                        return new CallAlert( message, duid, aliasList );
+                        return new CallAlert(message, duid, aliasList);
                     case DENY_RESPONSE:
-                        return new DenyResponse( message, duid, aliasList );
+                        return new DenyResponse(message, duid, aliasList);
                     case EXTENDED_FUNCTION_COMMAND:
-                        return new ExtendedFunctionCommand( message, duid, aliasList );
+                        return new ExtendedFunctionCommand(message, duid, aliasList);
                     case GROUP_AFFILIATION_QUERY:
-                        return new GroupAffiliationQuery( message, duid, aliasList );
+                        return new GroupAffiliationQuery(message, duid, aliasList);
                     case GROUP_AFFILIATION_RESPONSE:
-                        return new GroupAffiliationResponse( message, duid, aliasList );
+                        return new GroupAffiliationResponse(message, duid, aliasList);
                     case GROUP_DATA_CHANNEL_ANNOUNCEMENT:
-                        return new GroupDataChannelAnnouncement( message, duid, aliasList );
+                        return new GroupDataChannelAnnouncement(message, duid, aliasList);
                     case GROUP_DATA_CHANNEL_ANNOUNCEMENT_EXPLICIT:
-                        return new GroupDataChannelAnnouncementExplicit( message, duid, aliasList );
+                        return new GroupDataChannelAnnouncementExplicit(message, duid, aliasList);
                     case GROUP_DATA_CHANNEL_GRANT:
-                        return new GroupDataChannelGrant( message, duid, aliasList );
-				    case GROUP_VOICE_CHANNEL_GRANT:
-				        return new GroupVoiceChannelGrant( message, duid, aliasList );
-				    case GROUP_VOICE_CHANNEL_GRANT_UPDATE:
-				        return new GroupVoiceChannelGrantUpdate( message, duid, aliasList );
-				    case GROUP_VOICE_CHANNEL_GRANT_UPDATE_EXPLICIT:
-				        return new GroupVoiceChannelGrantUpdateExplicit( message, duid, aliasList );
+                        return new GroupDataChannelGrant(message, duid, aliasList);
+                    case GROUP_VOICE_CHANNEL_GRANT:
+                        return new GroupVoiceChannelGrant(message, duid, aliasList);
+                    case GROUP_VOICE_CHANNEL_GRANT_UPDATE:
+                        return new GroupVoiceChannelGrantUpdate(message, duid, aliasList);
+                    case GROUP_VOICE_CHANNEL_GRANT_UPDATE_EXPLICIT:
+                        return new GroupVoiceChannelGrantUpdateExplicit(message, duid, aliasList);
                     case IDENTIFIER_UPDATE_NON_VUHF:
-                        return new IdentifierUpdateNonVUHF( message, duid, aliasList );
+                        return new IdentifierUpdateNonVUHFFrequency(message, duid, aliasList);
                     case IDENTIFIER_UPDATE_TDMA:
-                    	return new IdentifierUpdateTDMA( message, duid, aliasList );
+                        return new IdentifierUpdateTDMAFrequency(message, duid, aliasList);
                     case IDENTIFIER_UPDATE_VHF_UHF_BANDS:
-                        return new IdentifierUpdateVUHF( message, duid, aliasList );
+                        return new IdentifierUpdateVUHFFrequency(message, duid, aliasList);
                     case INDIVIDUAL_DATA_CHANNEL_GRANT:
-                        return new IndividualDataChannelGrant( message, duid, aliasList );
+                        return new IndividualDataChannelGrant(message, duid, aliasList);
                     case LOCATION_REGISTRATION_RESPONSE:
-                    	return new LocationRegistrationResponse( message, duid, aliasList );
+                        return new LocationRegistrationResponse(message, duid, aliasList);
                     case MESSAGE_UPDATE:
-                        return new MessageUpdate( message, duid, aliasList );
+                        return new MessageUpdate(message, duid, aliasList);
                     case NETWORK_STATUS_BROADCAST:
-                        return new NetworkStatusBroadcast( message, duid, aliasList );
+                        return new NetworkStatusBroadcast(message, duid, aliasList);
                     case QUEUED_RESPONSE:
-                    	return new QueuedResponse( message, duid, aliasList );
+                        return new QueuedResponse(message, duid, aliasList);
                     case PROTECTION_PARAMETER_UPDATE:
-                        return new ProtectionParameterUpdate( message, duid, aliasList );
+                        return new ProtectionParameterUpdate(message, duid, aliasList);
                     case RADIO_UNIT_MONITOR_COMMAND:
-                    	return new RadioUnitMonitorCommand( message, duid, aliasList );
+                        return new RadioUnitMonitorCommand(message, duid, aliasList);
                     case RFSS_STATUS_BROADCAST:
-                    	return new RFSSStatusBroadcast( message, duid, aliasList );
+                        return new RFSSStatusBroadcast(message, duid, aliasList);
                     case ROAMING_ADDRESS_COMMAND:
-                    	return new RoamingAddressCommand( message, duid, aliasList );
+                        return new RoamingAddressCommand(message, duid, aliasList);
                     case SECONDARY_CONTROL_CHANNEL_BROADCAST:
-                    	return new SecondaryControlChannelBroadcast( message, duid, aliasList );
+                        return new SecondaryControlChannelBroadcast(message, duid, aliasList);
                     case SECONDARY_CONTROL_CHANNEL_BROADCAST_EXPLICIT:
-                    	return new SecondaryControlChannelBroadcastExplicit( message, duid, aliasList );
+                        return new SecondaryControlChannelBroadcastExplicit(message, duid, aliasList);
                     case SNDCP_DATA_CHANNEL_GRANT:
-                    	return new SNDCPDataChannelGrant( message, duid, aliasList );
+                        return new SNDCPDataChannelGrant(message, duid, aliasList);
                     case SNDCP_DATA_CHANNEL_ANNOUNCEMENT_EXPLICIT:
-                    	return new SNDCPDataChannelAnnouncementExplicit( message, duid, aliasList );
+                        return new SNDCPDataChannelAnnouncementExplicit(message, duid, aliasList);
                     case SNDCP_DATA_PAGE_REQUEST:
-                    	return new SNDCPDataPageRequest( message, duid, aliasList );
+                        return new SNDCPDataPageRequest(message, duid, aliasList);
                     case STATUS_QUERY:
-                    	return new StatusQuery( message, duid, aliasList );
+                        return new StatusQuery(message, duid, aliasList);
                     case STATUS_UPDATE:
-                    	return new StatusUpdate( message, duid, aliasList );
+                        return new StatusUpdate(message, duid, aliasList);
                     case TDMA_SYNC_BROADCAST:
-                    	return new SyncBroadcast( message, duid, aliasList );
+                        return new SyncBroadcast(message, duid, aliasList);
                     case SYSTEM_SERVICE_BROADCAST:
-                    	return new SystemServiceBroadcast( message, duid, aliasList );
-				    case TELEPHONE_INTERCONNECT_ANSWER_REQUEST:
-				        return new TelephoneInterconnectAnswerRequest( message, duid, aliasList );
-				    case TELEPHONE_INTERCONNECT_VOICE_CHANNEL_GRANT:
-				        return new TelephoneInterconnectVoiceChannelGrant( message, duid, aliasList );
-				    case TIME_DATE_ANNOUNCEMENT:
-				    	return new TimeAndDateAnnouncement( message, duid, aliasList );
+                        return new SystemServiceBroadcast(message, duid, aliasList);
+                    case TELEPHONE_INTERCONNECT_ANSWER_REQUEST:
+                        return new TelephoneInterconnectAnswerRequest(message, duid, aliasList);
+                    case TELEPHONE_INTERCONNECT_VOICE_CHANNEL_GRANT:
+                        return new TelephoneInterconnectVoiceChannelGrant(message, duid, aliasList);
+                    case TIME_DATE_ANNOUNCEMENT:
+                        return new TimeAndDateAnnouncement(message, duid, aliasList);
                     case UNIT_DEREGISTRATION_ACKNOWLEDGE:
-                    	return new UnitDeregistrationAcknowledge( message, duid, aliasList );
+                        return new UnitDeregistrationAcknowledge(message, duid, aliasList);
                     case UNIT_REGISTRATION_COMMAND:
-                    	return new UnitRegistrationCommand( message, duid, aliasList );
+                        return new UnitRegistrationCommand(message, duid, aliasList);
                     case UNIT_REGISTRATION_RESPONSE:
-                    	return new UnitRegistrationResponse( message, duid, aliasList );
+                        return new UnitRegistrationResponse(message, duid, aliasList);
                     case UNIT_TO_UNIT_ANSWER_REQUEST:
-                        return new UnitToUnitAnswerRequest( message, duid, aliasList );
+                        return new UnitToUnitAnswerRequest(message, duid, aliasList);
                     case UNIT_TO_UNIT_VOICE_CHANNEL_GRANT:
-                        return new UnitToUnitVoiceChannelGrant( message, duid, aliasList );
+                        return new UnitToUnitVoiceChannelGrant(message, duid, aliasList);
                     case UNIT_TO_UNIT_VOICE_CHANNEL_GRANT_UPDATE:
-                        return new UnitToUnitVoiceChannelGrantUpdate( message, duid, aliasList );
-				    default:
-		                return new TSBKMessage( message, duid, aliasList );
-				}
-				
-			case MOTOROLA:
-				MotorolaOpcode motorolaOpcode = MotorolaOpcode.
-						fromValue( message.getInt( TSBKMessage.OPCODE ) );
-				
-				switch( motorolaOpcode )
-				{
-					case CCH_PLANNED_SHUTDOWN:
-						return new PlannedControlChannnelShutdown( message, duid, aliasList );
-					case CONTROL_CHANNEL_ID:
-						return new ControlChannelBaseStationIdentification( message, duid, aliasList );
-					case PATCH_GROUP_ADD:
-						return new PatchGroupAdd( message, duid, aliasList );
-					case PATCH_GROUP_DELETE:
-						return new PatchGroupDelete( message, duid, aliasList );
-					case PATCH_GROUP_CHANNEL_GRANT:
-						return new PatchGroupVoiceChannelGrant( message, duid, aliasList );
-					case PATCH_GROUP_CHANNEL_GRANT_UPDATE:
-						return new PatchGroupVoiceChannelGrantUpdate( message, duid, aliasList );
-					case SYSTEM_LOAD:
-						return new SystemLoading( message, duid, aliasList );
-					case TRAFFIC_CHANNEL_ID:
-						return new TrafficChannelBaseStationIdentification( message, duid, aliasList );
-					default:
-				}
-				
-				return new MotorolaTSBKMessage( message, duid, aliasList );
-			default:
-				return new TSBKMessage( message, duid, aliasList );
-		}
-	}
+                        return new UnitToUnitVoiceChannelGrantUpdate(message, duid, aliasList);
+                    default:
+                        return new TSBKMessage(message, duid, aliasList);
+                }
+
+            case MOTOROLA:
+                MotorolaOpcode motorolaOpcode = MotorolaOpcode.fromValue(message.getInt(TSBKMessage.OPCODE));
+
+                switch(motorolaOpcode)
+                {
+                    case CCH_PLANNED_SHUTDOWN:
+                        return new PlannedControlChannnelShutdown(message, duid, aliasList);
+                    case CONTROL_CHANNEL_ID:
+                        return new ControlChannelBaseStationIdentification(message, duid, aliasList);
+                    case PATCH_GROUP_ADD:
+                        return new PatchGroupAdd(message, duid, aliasList);
+                    case PATCH_GROUP_DELETE:
+                        return new PatchGroupDelete(message, duid, aliasList);
+                    case PATCH_GROUP_CHANNEL_GRANT:
+                        return new PatchGroupVoiceChannelGrant(message, duid, aliasList);
+                    case PATCH_GROUP_CHANNEL_GRANT_UPDATE:
+                        return new PatchGroupVoiceChannelGrantUpdate(message, duid, aliasList);
+                    case SYSTEM_LOAD:
+                        return new SystemLoading(message, duid, aliasList);
+                    case TRAFFIC_CHANNEL_ID:
+                        return new TrafficChannelBaseStationIdentification(message, duid, aliasList);
+                    default:
+                }
+
+                return new MotorolaTSBKMessage(message, duid, aliasList);
+            default:
+                return new TSBKMessage(message, duid, aliasList);
+        }
+    }
 }

@@ -1,15 +1,10 @@
 package io.github.dsheirer.module.decode.p25.message.tdu.lc;
 
 import io.github.dsheirer.module.decode.p25.reference.Vendor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class TDULCMessageFactory
 {
-	private final static Logger mLog = 
-			LoggerFactory.getLogger( TDULCMessageFactory.class );
-
 	/**
 	 * Constructs a new sub-class of the TDULC message if the opcode is recognized
 	 * or returns the original message.
@@ -29,9 +24,9 @@ public class TDULCMessageFactory
 				case CALL_TERMINATION_OR_CANCELLATION:
 					return new CallTermination( message );
 				case CHANNEL_IDENTIFIER_UPDATE:
-					return new ChannelIdentifierUpdate( message );
+					return new ChannelIdentifierUpdateFrequency( message );
 				case CHANNEL_IDENTIFIER_UPDATE_EXPLICIT:
-					return new ChannelIdentifierUpdateExplicit( message );
+					return new ChannelIdentifierUpdateExplicitFrequency( message );
 				case EXTENDED_FUNCTION_COMMAND:
 					return new ExtendedFunctionCommand( message );
 				case GROUP_AFFILIATION_QUERY:
