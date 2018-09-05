@@ -34,7 +34,6 @@ import io.github.dsheirer.source.tuner.channel.TunerChannelSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,36 +171,6 @@ public class PolyphaseChannelManager implements ISourceEventProcessor
         return channelSource;
     }
 
-    public TunerChannelSource getTestChannel(int index)
-    {
-        PolyphaseChannelSource channelSource = null;
-
-        try
-        {
-            List<Integer> polyphaseIndexes = new ArrayList<>();
-            polyphaseIndexes.add(index);
-
-            IPolyphaseChannelOutputProcessor outputProcessor = getOutputProcessor(polyphaseIndexes);
-
-
-            if(outputProcessor != null)
-            {
-                long centerFrequency = mChannelCalculator.getCenterFrequencyForIndexes(polyphaseIndexes);
-
-                TunerChannel tunerChannel = new TunerChannel(centerFrequency, 12500);
-
-                channelSource = new PolyphaseChannelSource(tunerChannel, outputProcessor, mChannelSourceEventListener,
-                    mChannelCalculator.getChannelSampleRate(), centerFrequency);
-            }
-        }
-        catch(IllegalArgumentException iae)
-        {
-            mLog.error("Couldn't get test channel with index:" + index, iae);
-        }
-
-        return channelSource;
-    }
-
     /**
      * Creates a processor to process the channelizer channel indexes into a composite output stream providing
      * channelized complex sample buffers to a registered source listener.
@@ -213,12 +182,14 @@ public class PolyphaseChannelManager implements ISourceEventProcessor
         switch(indexes.size())
         {
             case 1:
-                return new OneChannelOutputProcessor(mChannelCalculator.getChannelSampleRate(), indexes);
+                return new OneChannelOutputProcessor(mChannelCalculator.getChannelSampleRate(), indexes,
+                    mChannelCalculator.getChannelCount());
             case 2:
                 try
                 {
                     float[] filter = getOutputProcessorFilter(2);
-                    return new TwoChannelOutputProcessor(mChannelCalculator.getChannelSampleRate(), indexes, filter);
+                    return new TwoChannelOutputProcessor(mChannelCalculator.getChannelSampleRate(), indexes, filter,
+                        mChannelCalculator.getChannelCount());
                 }
                 catch(FilterDesignException fde)
                 {
@@ -504,8 +475,8 @@ public class PolyphaseChannelManager implements ISourceEventProcessor
 
         if(taps == null)
         {
-            taps = FilterFactory.getSincM2Synthesizer(mChannelCalculator.getChannelBandwidth(), channels,
-                POLYPHASE_SYNTHESIZER_TAPS_PER_CHANNEL);
+            taps = FilterFactory.getSincM2Synthesizer(mChannelCalculator.getChannelSampleRate(),
+                mChannelCalculator.getChannelBandwidth(), channels, POLYPHASE_SYNTHESIZER_TAPS_PER_CHANNEL);
 
             mOutputProcessorFilters.put(channels, taps);
         }
