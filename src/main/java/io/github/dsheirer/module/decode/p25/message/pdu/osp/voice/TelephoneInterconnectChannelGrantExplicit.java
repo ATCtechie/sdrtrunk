@@ -27,6 +27,7 @@ import io.github.dsheirer.module.decode.p25.message.pdu.PDUMessage;
 import io.github.dsheirer.module.decode.p25.reference.DataUnitID;
 import io.github.dsheirer.module.decode.p25.reference.ServiceOptions;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +45,7 @@ public class TelephoneInterconnectChannelGrantExplicit extends PDUMessage implem
     public static final int[] MULTIPLE_BLOCK_CRC = {224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236,
         237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
+    private SimpleDateFormat mTimeDurationFormat = new SimpleDateFormat("HH:mm:ss.SSS");
     private ServiceOptions mServiceOptions;
     private IIdentifier mAnyAddress;
     private IAPCO25Channel mChannel;
