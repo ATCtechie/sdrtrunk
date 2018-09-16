@@ -21,11 +21,13 @@ import io.github.dsheirer.source.Source;
 import io.github.dsheirer.source.SourceException;
 import io.github.dsheirer.source.config.SourceConfigTuner;
 import io.github.dsheirer.source.tuner.TunerEvent.Event;
+import io.github.dsheirer.source.tuner.channel.ChannelSpecification;
 import io.github.dsheirer.source.tuner.channel.TunerChannel;
 import io.github.dsheirer.source.tuner.channel.TunerChannelSource;
 import io.github.dsheirer.source.tuner.configuration.TunerConfiguration;
 import io.github.dsheirer.source.tuner.configuration.TunerConfigurationModel;
 import io.github.dsheirer.spectrum.SpectralDisplayPanel;
+import io.github.dsheirer.util.ThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class TunerModel extends AbstractTableModel implements Listener<TunerEvent>
 {
@@ -201,7 +204,17 @@ public class TunerModel extends AbstractTableModel implements Listener<TunerEven
 
         if(enabled && mTuners.size() > 0)
         {
-            broadcast(new TunerEvent(mTuners.get(0), Event.REQUEST_MAIN_SPECTRAL_DISPLAY));
+            //Hack: the airspy tuner would lockup aperiodically and refuse to produce
+            //transfer buffers ... delaying registering for buffers for 500 ms seems
+            //to allow the airspy to stabilize before we start asking for samples.
+            ThreadPool.SCHEDULED.schedule(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    broadcast(new TunerEvent(mTuners.get(0), Event.REQUEST_MAIN_SPECTRAL_DISPLAY));
+                }
+            }, 500, TimeUnit.MILLISECONDS);
         }
         else
         {
@@ -327,13 +340,13 @@ public class TunerModel extends AbstractTableModel implements Listener<TunerEven
      *
      * Returns null if no tuner can source the channel
      */
-    public Source getSource(SourceConfigTuner config, int bandwidth)
+    public Source getSource(SourceConfigTuner config, ChannelSpecification channelSpecification)
     {
         TunerChannelSource retVal = null;
 
         TunerChannel tunerChannel = config.getTunerChannel();
 
-        tunerChannel.setBandwidth(bandwidth);
+        tunerChannel.setBandwidth(channelSpecification.getBandwidth());
 
         Iterator<Tuner> it = mTuners.iterator();
 
@@ -347,7 +360,7 @@ public class TunerModel extends AbstractTableModel implements Listener<TunerEven
             {
                 try
                 {
-                    retVal = tuner.getChannelSourceManager().getSource(tunerChannel);
+                    retVal = tuner.getChannelSourceManager().getSource(tunerChannel, channelSpecification);
 
                     if(retVal != null)
                     {
@@ -370,7 +383,7 @@ public class TunerModel extends AbstractTableModel implements Listener<TunerEven
 
             try
             {
-                retVal = tuner.getChannelSourceManager().getSource(tunerChannel);
+                retVal = tuner.getChannelSourceManager().getSource(tunerChannel, channelSpecification);
             }
             catch(Exception e)
             {

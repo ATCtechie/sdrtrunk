@@ -212,7 +212,7 @@ public class ChannelProcessingManager implements ChannelEventListener
         try
         {
             source = mSourceManager.getSource(channel.getSourceConfiguration(),
-                channel.getDecodeConfiguration().getDecoderType().getChannelBandwidth());
+                channel.getDecodeConfiguration().getChannelSpecification());
         }
         catch(SourceException se)
         {

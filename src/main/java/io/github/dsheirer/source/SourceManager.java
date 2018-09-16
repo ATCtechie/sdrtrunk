@@ -25,6 +25,7 @@ import io.github.dsheirer.source.mixer.MixerManager;
 import io.github.dsheirer.source.recording.RecordingSourceManager;
 import io.github.dsheirer.source.tuner.TunerManager;
 import io.github.dsheirer.source.tuner.TunerModel;
+import io.github.dsheirer.source.tuner.channel.ChannelSpecification;
 
 public class SourceManager
 {
@@ -73,8 +74,7 @@ public class SourceManager
         return mTunerModel;
     }
 
-    public Source getSource(SourceConfiguration config, int bandwidth)
-        throws SourceException
+    public Source getSource(SourceConfiguration config, ChannelSpecification channelSpecification) throws SourceException
     {
         Source retVal = null;
 
@@ -84,10 +84,10 @@ public class SourceManager
                 retVal = mMixerManager.getSource(config);
                 break;
             case TUNER:
-                retVal = mTunerModel.getSource((SourceConfigTuner) config, bandwidth);
+                retVal = mTunerModel.getSource((SourceConfigTuner) config, channelSpecification);
                 break;
             case RECORDING:
-                retVal = mRecordingSourceManager.getSource(config, bandwidth);
+                retVal = mRecordingSourceManager.getSource(config, channelSpecification);
             case NONE:
             default:
                 break;

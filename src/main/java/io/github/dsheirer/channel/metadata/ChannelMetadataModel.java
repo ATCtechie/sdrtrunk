@@ -1,19 +1,16 @@
 /*******************************************************************************
- * sdrtrunk
- * Copyright (C) 2014-2017 Dennis Sheirer
+ * sdr-trunk
+ * Copyright (C) 2014-2018 Dennis Sheirer
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by  the Free Software Foundation, either version 3 of the License, or  (at your option) any
+ * later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,  but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU General Public License  along with this program.
+ * If not, see <http://www.gnu.org/licenses/>
  *
  ******************************************************************************/
 package io.github.dsheirer.channel.metadata;
@@ -21,9 +18,11 @@ package io.github.dsheirer.channel.metadata;
 import io.github.dsheirer.channel.state.State;
 import io.github.dsheirer.controller.channel.Channel;
 import io.github.dsheirer.sample.Listener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.table.AbstractTableModel;
-import java.awt.*;
+import java.awt.EventQueue;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +31,8 @@ import java.util.Map;
 
 public class ChannelMetadataModel extends AbstractTableModel implements Listener<MutableMetadataChangeEvent>
 {
+    private final static Logger mLog = LoggerFactory.getLogger(ChannelMetadataModel.class);
+
     private final DecimalFormat FREQUENCY_FORMATTER = new DecimalFormat( "#.00000" );
 
     public static final int COLUMN_STATE = 0;
@@ -45,7 +46,7 @@ public class ChannelMetadataModel extends AbstractTableModel implements Listener
     public static final int COLUMN_CONFIGURATION_NAME = 8;
     public static final int COLUMN_MESSAGE = 9;
 
-    private static final String[] COLUMNS = {"State", "Decoder", "Channel", "Frequency", "Primary From", "Primary To",
+    private static final String[] COLUMNS = {"Status", "Decoder", "Channel", "Frequency", "Primary From", "Primary To",
          "Secondary From", "Secondary To", "Channel Name", "Message"};
 
     private List<MutableMetadata> mChannelMetadata = new ArrayList();
@@ -184,7 +185,11 @@ public class ChannelMetadataModel extends AbstractTableModel implements Listener
 
                     return null;
                 case COLUMN_MESSAGE:
-                    if(metadata.hasMessageType() | metadata.hasMessage())
+                    if(metadata.isBufferOverflow())
+                    {
+                        return "**OVERFLOW**";
+                    }
+                    else if(metadata.hasMessageType() || metadata.hasMessage())
                     {
                         StringBuilder sb = new StringBuilder();
                         if(metadata.hasMessageType())
@@ -248,6 +253,7 @@ public class ChannelMetadataModel extends AbstractTableModel implements Listener
                         case CHANNEL_STATE:
                             fireTableCellUpdated(rowIndex, COLUMN_STATE);
                             break;
+                        case BUFFER_OVERFLOW:
                         case MESSAGE:
                         case MESSAGE_TYPE:
                             fireTableCellUpdated(rowIndex, COLUMN_MESSAGE);
